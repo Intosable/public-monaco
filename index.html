@@ -21,11 +21,10 @@
 <body>
     <div id="container"></div>
 
-    <!-- Use CDN for loader.js -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.js"></script>
     <script>
         window.chrome?.webview?.addEventListener('message', event => {
-            // You can later respond here if needed
+            // Message listener
         });
 
         require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' } });
@@ -56,25 +55,25 @@
                 smoothScrolling: true,
             });
 
-            // Enable auto-indentation for Lua
-            monaco.languages.setLanguageConfiguration('lua', {
-                autoClosingPairs: [
-                    { open: '{', close: '}' },
-                    { open: '[', close: ']' },
-                    { open: '(', close: ')' },
-                    { open: '"', close: '"', notIn: ['string'] },
-                    { open: "'", close: "'", notIn: ['string'] },
-                ],
-                surroundingPairs: [
-                    { open: '{', close: '}' },
-                    { open: '[', close: ']' },
-                    { open: '(', close: ')' },
-                    { open: '"', close: '"' },
-                    { open: "'", close: "'" },
-                ],
-                indentationRules: {
-                    increaseIndentPattern: /^\s*(function|then|do|\{|\[).*$/,
-                    decreaseIndentPattern: /^\s*(end|elseif|else|\}|\]).*$/
+            // Simulated auto-indent for Lua
+            editor.onKeyDown(function(e) {
+                if (e.keyCode === monaco.KeyCode.Enter) {
+                    const position = editor.getPosition();
+                    const model = editor.getModel();
+                    const lineContent = model.getLineContent(position.lineNumber - 1).trim();
+
+                    const shouldIndent = /^(function|do|then|\{|\[)$/.test(lineContent);
+                    const shouldOutdent = /^(end|else|elseif|\}|\])$/.test(lineContent);
+
+                    if (shouldIndent) {
+                        setTimeout(() => {
+                            editor.executeEdits('', [{
+                                range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
+                                text: '    ',
+                                forceMoveMarkers: true
+                            }]);
+                        }, 0);
+                    }
                 }
             });
 
