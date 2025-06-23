@@ -24,10 +24,12 @@
     <!-- Use CDN for loader.js -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.js"></script>
     <script>
-        window.chrome.webview.addEventListener('message', event => {
-    // You can later respond here if needed
-});
-        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' }});
+        window.chrome?.webview?.addEventListener('message', event => {
+            // You can later respond here if needed
+        });
+
+        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' } });
+
         require(["vs/editor/editor.main"], function () {
             monaco.editor.defineTheme('custom-dark', {
                 base: 'vs-dark',
@@ -52,6 +54,28 @@
                 },
                 showFoldingControls: "always",
                 smoothScrolling: true,
+            });
+
+            // Enable auto-indentation for Lua
+            monaco.languages.setLanguageConfiguration('lua', {
+                autoClosingPairs: [
+                    { open: '{', close: '}' },
+                    { open: '[', close: ']' },
+                    { open: '(', close: ')' },
+                    { open: '"', close: '"', notIn: ['string'] },
+                    { open: "'", close: "'", notIn: ['string'] },
+                ],
+                surroundingPairs: [
+                    { open: '{', close: '}' },
+                    { open: '[', close: ']' },
+                    { open: '(', close: ')' },
+                    { open: '"', close: '"' },
+                    { open: "'", close: "'" },
+                ],
+                indentationRules: {
+                    increaseIndentPattern: /^\s*(function|then|do|\{|\[).*$/,
+                    decreaseIndentPattern: /^\s*(end|elseif|else|\}|\]).*$/
+                }
             });
 
             window.onresize = function () {
