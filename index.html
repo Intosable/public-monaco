@@ -57,25 +57,29 @@
 
             // Simulated auto-indent for Lua
             editor.onKeyDown(function(e) {
-                if (e.keyCode === monaco.KeyCode.Enter) {
-                    const position = editor.getPosition();
-                    const model = editor.getModel();
-                    const lineContent = model.getLineContent(position.lineNumber - 1).trim();
+    if (e.keyCode === monaco.KeyCode.Enter) {
+        const position = editor.getPosition();
+        const model = editor.getModel();
 
-                    const shouldIndent = /^(function|do|then|\{|\[)$/.test(lineContent);
-                    const shouldOutdent = /^(end|else|elseif|\}|\])$/.test(lineContent);
+        let lineContent = '';
+        if (position.lineNumber > 1) {
+            lineContent = model.getLineContent(position.lineNumber - 1).trim();
+        }
 
-                    if (shouldIndent) {
-                        setTimeout(() => {
-                            editor.executeEdits('', [{
-                                range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
-                                text: '    ',
-                                forceMoveMarkers: true
-                            }]);
-                        }, 0);
-                    }
-                }
-            });
+        const shouldIndent = /^(function|do|then|\{|\[)$/.test(lineContent);
+        const shouldOutdent = /^(end|else|elseif|\}|\])$/.test(lineContent);
+
+        if (shouldIndent) {
+            setTimeout(() => {
+                editor.executeEdits('', [{
+                    range: new monaco.Range(position.lineNumber, 1, position.lineNumber, 1),
+                    text: '    ', // insert 4 spaces
+                    forceMoveMarkers: true
+                }]);
+            }, 0);
+        }
+    }
+});
 
             window.onresize = function () {
                 editor.layout();
